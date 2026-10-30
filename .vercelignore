@@ -1,0 +1,13 @@
+backend/
+mindspace_custom_model/
+model_training/
+*.pptx
+*.docx
+*.db*
+*.sqlite*
+.vscode/
+node_modules/
+.next/
+logs/
+*.log
+

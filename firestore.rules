@@ -1,0 +1,57 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    match /users/{userId} {
+      allow create: if owns(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.email == request.auth.token.email;
+      allow read: if owns(userId);
+      allow update: if owns(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.email == resource.data.email;
+      allow delete: if false;
+    }
+
+    match /moods/{moodId} {
+      allow create: if owns(request.resource.data.uid);
+      allow read, delete: if owns(resource.data.uid);
+      allow update: if owns(resource.data.uid)
+        && request.resource.data.uid == resource.data.uid;
+    }
+
+    match /journals/{journalId} {
+      allow create: if owns(request.resource.data.uid);
+      allow read, delete: if owns(resource.data.uid);
+      allow update: if owns(resource.data.uid)
+        && request.resource.data.uid == resource.data.uid;
+    }
+
+    match /conversations/{conversationId} {
+      allow create: if owns(request.resource.data.uid);
+      allow read, delete: if owns(resource.data.uid);
+      allow update: if owns(resource.data.uid)
+        && request.resource.data.uid == resource.data.uid;
+    }
+
+    match /messages/{messageId} {
+      allow create: if owns(request.resource.data.uid);
+      allow read, delete: if owns(resource.data.uid);
+      allow update: if owns(resource.data.uid)
+        && request.resource.data.uid == resource.data.uid;
+    }
+
+    match /patients/{patientId} {
+      allow read: if owns(resource.data.patientUid)
+        || owns(resource.data.psychiatristUid);
+    }
+  }
+}
